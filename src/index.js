@@ -3,6 +3,8 @@ import createShader from './shaders/createShader';
 import resizeCanvasToDisplaySize from './utils/resizeCanvasToDisplaySize';
 import vertexShaderFile from './shaders/vertex/2d-vertex-shader.glsl';
 import fragmentShaderFile from './shaders/fragment/2d-fragment-shader.glsl';
+import rectangle from './shapes/rectangle';
+import vector4 from './math/vector4';
 
 function createProgram(gl, vertexShader, fragmentShader) {
     const program = gl.createProgram();
@@ -18,7 +20,7 @@ function createProgram(gl, vertexShader, fragmentShader) {
         gl.deleteProgram(program);
         return null;
     }
-    
+
     return program;
 }
 
@@ -43,17 +45,15 @@ function main() {
     // look up where the vertex data needs to go.
     const positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
 
-    // Create a buffer and put three 2d clip space points in it
+    // look up uniform locations
+    const resolutionUniformLocation = gl.getUniformLocation(program, 'u_resolution');
+    const colorUniformLocation = gl.getUniformLocation(program, 'u_color');
+
+    // Create a buffer to put three 2d clip space points in
     const positionBuffer = gl.createBuffer();
 
     // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-    const positions = [0, 0, 0, 0.5, 0.7, 0];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-    // code above this line is initialization code.
-    // code below this line is rendering code.
 
     resizeCanvasToDisplaySize(gl.canvas);
 
@@ -74,18 +74,25 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
     // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    const size = 2; // 2 components per iteration
-    const type = gl.FLOAT; // the data is 32bit floats
+    const size = 2;          // 2 components per iteration
+    const type = gl.FLOAT;   // the data is 32bit floats
     const normalize = false; // don't normalize the data
-    const stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-    let offset = 0; // start at the beginning of the buffer
-    gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
+    const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+    let offset = 0;        // start at the beginning of the buffer
+    gl.vertexAttribPointer(
+        positionAttributeLocation, size, type, normalize, stride, offset);
 
-    // draw
-    const primitiveType = gl.TRIANGLES;
-    offset = 0;
-    const count = 3;
-    gl.drawArrays(primitiveType, offset, count);
+    // set the resolution
+    gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+
+    const rect = rectangle(gl);
+    rect.x = 10;
+    rect.y =  40;
+    rect.width = 100;
+    rect.height = 300;
+    rect.color = vector4(1, 0, 0);
+    rect.colorUniform = colorUniformLocation;
+    rect.draw();
 }
 
 main();
