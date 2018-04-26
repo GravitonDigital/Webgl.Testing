@@ -1,0 +1,24 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="dist/css/style.css"></link>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+
+<script type="application/javascript">
+    const canvas = document.getElementById('canvas');
+    const gl = canvas.getContext('webgl');
+    if (!gl) {
+        console.error('You need to enable webgl to run the content on this page');
+    }
+</script>
+
+<script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+<script src="https://webglfundamentals.org/webgl/resources/webgl-lessons-helper.js"></script>
+
+<script type="application/javascript" src="dist/bundle.js"></script>
+
+</html>
