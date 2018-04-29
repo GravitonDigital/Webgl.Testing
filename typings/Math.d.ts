@@ -5,4 +5,9 @@ namespace GD.Math {
         z: number;
         w: number;
     }
+
+    interface Vector2 {
+        x: number;
+        y: number;
+    }
 }

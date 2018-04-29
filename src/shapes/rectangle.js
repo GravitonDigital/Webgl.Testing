@@ -1,4 +1,7 @@
 import vector4 from '../math/vector4';
+import position from '../core/position';
+import size from '../core/size';
+import pipe from '../utils/pipe';
 /**
  * @param {WebGLRenderingContext} renderingContext
  * @returns {GD.Shapes.Rectangle}
@@ -6,12 +9,9 @@ import vector4 from '../math/vector4';
 export default function rectangle(renderingContext) {
     /**@type {GD.Shapes.Rectangle} */
     const state = {
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
         color: vector4(),
-        colorUniform: undefined
+        colorUniform: undefined,
+        isDirty: false
     };
 
     let gl = renderingContext;
@@ -25,10 +25,12 @@ export default function rectangle(renderingContext) {
     }
 
     function getBufferArray() {
-        const x1 = state.x;
-        const x2 = state.x + state.width;
-        const y1 = state.y;
-        const y2 = state.y + state.height;
+        const position = state.getPosition();
+        const size = state.getSize();
+        const x1 = position.x;
+        const x2 = position.x + size.width;
+        const y1 = position.y;
+        const y2 = position.y + size.height;
 
         return new Float32Array([x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2]);
     }
@@ -40,16 +42,29 @@ export default function rectangle(renderingContext) {
     function draw() {
         state.addToBuffer();
         gl.uniform4f(state.colorUniform, state.color.x, state.color.y, state.color.z, state.color.w);
-        var primitiveType = gl.TRIANGLES;
-        var offset = 0;
-        var count = 6;
-        gl.drawArrays(primitiveType, offset, count);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        state.isDirty = false;
     }
 
-    return Object.assign(state, {
+    function setSize(size) {
+        state.isDirty = true;
+        return size;
+    }
+
+    function setPosition(position) {
+        state.isDirty = true;
+        return position;
+    }
+
+    const myPosition = position();
+    const mySize = size();
+
+    return Object.assign(state, myPosition, mySize, {
         addToBuffer,
         draw,
         setRenderingContext,
-        getRenderingContext
+        getRenderingContext,
+        setSize: pipe(setSize, mySize.setSize),
+        setPosition: pipe(setPosition, myPosition.setPosition)
     });
 }

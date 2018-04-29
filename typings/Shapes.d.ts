@@ -1,7 +1,5 @@
 namespace GD.Shapes {
-    interface Rectangle {
-        x: number;
-        y: number;
+    interface Rectangle extends GD.Core.Position, GD.Core.Size {
         width: number;
         height: number;
         color: GD.Math.Vector4;
