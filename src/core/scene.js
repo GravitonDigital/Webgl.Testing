@@ -1,10 +1,11 @@
 /**
  * @returns {GD.Core.Scene}
  */
-export default function scene() {
+export default function scene(name = '') {
     /**@type {GD.Core.Scene} */
     const state = {
-        children: []
+        children: [],
+        name: name
     };
 
     function draw(gl) {

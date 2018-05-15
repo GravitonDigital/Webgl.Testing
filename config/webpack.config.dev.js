@@ -57,7 +57,7 @@ module.exports = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true,
+                            modules: false,
                             camelCase: 'dashes',
                             localIdentName: '[path][name]__[local]'
                         }

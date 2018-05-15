@@ -29,5 +29,7 @@ namespace GD.Core {
         getRenderingContext(): WebGLRenderingContext;
         getAttribLocation(): GLint; 
         getUniformLocation(): GLint;
+        onSceneAdded: signals.Signal;
+        onSceneRemoved: signals.Signal;
     }
 }

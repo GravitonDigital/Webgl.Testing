@@ -1,8 +1,42 @@
 body {
   margin: 0;
 }
+
 canvas {
   width: 100vw;
   height: 100vh;
   display: block;
+}
+
+.scene-picker {
+  background-color: #1a1a38;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  width: 200px;
+  color: #1affff;
+  font-weight: bold;
+  > span {
+    margin-left: 40px;
+    font-size: 1.2em;
+  }
+  :first-child {
+    margin-top: 5px;
+  }
+  :last-child {
+    margin-bottom: 5px;
+  }
+  div:nth-child(odd) {
+    background-color: #1A314C;
+  }
+  > div {
+    padding: 0px 5px 0px 5px;
+    > span {
+      margin-left: 15px;
+    }
+    > input {
+      position: relative;
+      top: 1px;
+    }
+  }
 }

@@ -2,13 +2,17 @@ import resizeCanvasToDisplaySize from '../utils/resizeCanvasToDisplaySize';
 import createShader from '../shaders/createShader';
 import vertexShaderFile from '../shaders/vertex/2d-vertex-shader.glsl';
 import fragmentShaderFile from '../shaders/fragment/2d-fragment-shader.glsl';
+import { Signal } from 'signals';
 
 /**
  * @returns {GD.Core.Renderer}
  */
 export default function renderer(canvas) {
     /**@type {GD.Core.Renderer} */
-    const state = {};
+    const state = {
+        onSceneAdded: new Signal(),
+        onSceneRemoved: new Signal()
+    };
 
     /**@type {Array<GD.Core.Scene} */
     let scenes = [];
@@ -56,20 +60,24 @@ export default function renderer(canvas) {
     }
 
     function addScene(scene) {
+        state.removeScene(scene);
         scenes.push(scene);
+        state.onSceneAdded.dispatch(scene);
+        _isDirty = true;
     }
 
-    function addSceneAt(newScene, index) {
-        scenes.splice(index, 0, newScene);
+    function addSceneAt(scene, index) {
+        state.removeScene(scene);
+        scenes.splice(index, 0, scene);
+        state.onSceneAdded.dispatch(scene);
+        _isDirty = true;
     }
 
-    /**
-     * @param {GD.Core.Scene} sceneToRemove
-     */
     function removeScene(sceneToRemove) {
         const index = scenes.indexOf(sceneToRemove);
         if (index !== -1) {
             scenes.splice(index, 1);
+            state.onSceneRemoved.dispatch(sceneToRemove);
             _isDirty = true;
         }
     }
