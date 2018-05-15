@@ -4,10 +4,20 @@ import vector4 from './math/vector4';
 import vector2 from './math/vector2';
 import renderer from './core/renderer';
 import scene from './core/scene';
+import Stats from 'stats.js';
+
+const stats = new Stats();
+stats.showPanel(0);
+document.body.appendChild(stats.dom);
 
 function render(myRenderer) {
     requestAnimationFrame(() => {
+        stats.begin();
+
         myRenderer.render();
+
+        stats.end();
+
         render(myRenderer);
     });
 }
@@ -22,7 +32,7 @@ function main() {
     const myScene = scene();
 
     const rect = rectangle();
-    rect.setPosition(vector2(10, 40));
+    rect.setPosition(vector2(300, 40));
     rect.setSize({ width: 100, height: 300 });
     rect.color = vector4(1, 0, 0);
     rect.colorUniform = myRenderer.getUniformLocation('u_color');
@@ -33,5 +43,4 @@ function main() {
 
     render(myRenderer);
 }
-
 main();
