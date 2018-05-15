@@ -11,7 +11,7 @@ export default function scene(name) {
         name: name || ''
     };
 
-    const hasChildrenState = hasChildren();
+    const hasChildrenState = hasChildren(state);
     const canBeDirtyState = canBeDirty();
 
     return Object.assign(state, hasChildrenState, canBeDirtyState, {

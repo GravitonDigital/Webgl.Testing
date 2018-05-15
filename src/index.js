@@ -6,6 +6,7 @@ import renderer from './core/renderer';
 import scene from './core/scene';
 import Stats from 'stats.js';
 import scenePicker from './userinterface/scenePicker';
+import container from './core/container';
 
 const stats = new Stats();
 stats.showPanel(0);
@@ -43,7 +44,12 @@ function main() {
     rect.color = vector4(1, 0, 0);
     rect.colorUniform = myRenderer.getUniformLocation('u_color');
 
-    myScene.add(rect);
+    const myContainer = container();
+    myContainer.add(rect);
+
+    myScene.add(myContainer);
+
+    myContainer.setPosition(vector2(100, -50));
 
     const myScenePicker = scenePicker();
     app.appendChild(myScenePicker.getDom());

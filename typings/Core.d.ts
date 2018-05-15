@@ -35,6 +35,8 @@ namespace GD.Core {
         name: string;
     }
 
+    interface Container extends GD.Core.HasChildren, GD.Core.CanBeDirty, GD.Core.Position {}
+
     interface Renderer {
         render(): void;
         update(dt: number): void;
