@@ -10,9 +10,11 @@ export default function renderer(canvas) {
     /**@type {GD.Core.Renderer} */
     const state = {};
 
-    let scene = undefined;
+    /**@type {Array<GD.Core.Scene} */
+    let scenes = [];
     let program = undefined;
     let gl = undefined;
+    let _isDirty = true;
 
     function createProgram(vertexShader, fragmentShader) {
         if (program) {
@@ -28,29 +30,52 @@ export default function renderer(canvas) {
         const success = gl.getProgramParameter(program, gl.LINK_STATUS);
 
         if (!success) {
-            console.log(gl.getProgramInfoLog(program));
+            console.error(gl.getProgramInfoLog(program));
             gl.deleteProgram(program);
             return null;
         }
         return program;
     }
 
+    function isDirty() {
+        return scenes.some(scene => scene.isDirty()) || _isDirty;
+    }
+
     function render() {
-        if (scene && scene.isDirty()) {
+        if (isDirty()) {
             // Clear the canvas
             gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
-            scene.draw(gl);
+            scenes.forEach(scene => {
+                scene.draw(gl);
+            });
+
+            _isDirty = false;
         }
     }
 
-    function setScene(newScene) {
-        scene = newScene;
+    function addScene(scene) {
+        scenes.push(scene);
     }
 
-    function getScene() {
-        return scene;
+    function addSceneAt(newScene, index) {
+        scenes.splice(index, 0, newScene);
+    }
+
+    /**
+     * @param {GD.Core.Scene} sceneToRemove
+     */
+    function removeScene(sceneToRemove) {
+        const index = scenes.indexOf(sceneToRemove);
+        if (index !== -1) {
+            scenes.splice(index, 1);
+            _isDirty = true;
+        }
+    }
+
+    function getScenes() {
+        return scenes;
     }
 
     function getRenderingContext() {
@@ -117,8 +142,11 @@ export default function renderer(canvas) {
 
     return Object.assign(state, {
         render,
-        getScene,
-        setScene,
+        getScenes,
+        addScene,
+        addSceneAt,
+        removeScene,
+        isDirty,
         getRenderingContext,
         getAttribLocation,
         getUniformLocation

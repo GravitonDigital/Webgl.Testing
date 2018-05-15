@@ -39,7 +39,7 @@ function main() {
 
     myScene.add(rect);
 
-    myRenderer.setScene(myScene);
+    myRenderer.addScene(myScene);
 
     render(myRenderer);
 }

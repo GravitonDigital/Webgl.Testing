@@ -21,10 +21,13 @@ namespace GD.Core {
 
     interface Renderer {
         render(): void;
-        getScene(): GD.Core.Scene;
-        setScene(scene: GD.Core.Scene): void;
+        getScenes(): Array<GD.Core.Scene>;
+        addScene(scene: GD.Core.Scene): void;
+        addSceneAt(scene: GD.Core.Scene, index: number): void;
+        removeScene(scene: GD.Core.Scene): void;
+        isDirty(): boolean;
         getRenderingContext(): WebGLRenderingContext;
-        getAttribLocation(): GLint;
+        getAttribLocation(): GLint; 
         getUniformLocation(): GLint;
     }
 }
