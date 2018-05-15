@@ -36,11 +36,11 @@ export default function renderer(canvas) {
     }
 
     function render() {
-        if(scene && scene.isDirty()){
+        if (scene && scene.isDirty()) {
             // Clear the canvas
             gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT);
-    
+
             scene.draw(gl);
         }
     }
@@ -65,10 +65,10 @@ export default function renderer(canvas) {
         return gl.getUniformLocation(program, uni);
     }
 
-    function init(){
+    function init() {
         gl = canvas.getContext('webgl');
         if (!gl) {
-            console.error('You need webgl to run the content on this page');
+            throw 'You need webgl to run the content on this page';
         } else {
             const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderFile);
             const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderFile);
@@ -79,18 +79,18 @@ export default function renderer(canvas) {
 
             // look up uniform locations
             const resolutionUniformLocation = getUniformLocation('u_resolution');
-        
+
             // Create a buffer to put three 2d clip space points in
             const positionBuffer = gl.createBuffer();
-        
+
             // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
             gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        
+
             resizeCanvasToDisplaySize(gl.canvas);
-        
+
             // Tell WebGL how to convert from clip space to pixels
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        
+
             // Tell it to use our program (pair of shaders)
             gl.useProgram(program);
 
@@ -99,7 +99,7 @@ export default function renderer(canvas) {
 
             // // Bind the position buffer.
             gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        
+
             // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
             const size = 2; // 2 components per iteration
             const type = gl.FLOAT; // the data is 32bit floats
@@ -107,14 +107,14 @@ export default function renderer(canvas) {
             const stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
             let offset = 0; // start at the beginning of the buffer
             gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
-        
+
             // set the resolution
             gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
         }
     }
 
     init();
-        
+
     return Object.assign(state, {
         render,
         getScene,
