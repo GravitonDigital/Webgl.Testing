@@ -1,57 +1,22 @@
+import hasChildren from './hasChildren';
+import pipe from '../utils/pipe';
+import canBeDirty from './canBeDirty';
+
 /**
  * @returns {GD.Core.Scene}
  */
-export default function scene(name = '') {
+export default function scene(name) {
     /**@type {GD.Core.Scene} */
     const state = {
-        children: [],
-        name: name
+        name: name || ''
     };
 
-    function update(dt) {
-        for (let i = 0; i < state.children.length; i += 1) {
-            if (state.children[i].update) {
-                state.children[i].update(dt);
-            }
-        }
-    }
+    const hasChildrenState = hasChildren();
+    const canBeDirtyState = canBeDirty();
 
-    function draw(gl) {
-        for (let i = 0; i < state.children.length; i += 1) {
-            state.children[i].draw(gl);
-        }
-    }
-
-    function add(child) {
-        state.children.push(child);
-    }
-
-    function addAt(child, index) {
-        state.children.splice(index, 0, child);
-    }
-
-    function remove(child) {
-        const index = state.children.indexOf(child);
-        if (index !== -1) {
-            state.children.splice(index, 1);
-        }
-    }
-
-    function removeAll() {
-        state.children = [];
-    }
-
-    function isDirty() {
-        return state.children.some(c => c.isDirty);
-    }
-
-    return Object.assign(state, {
-        update,
-        draw,
-        add,
-        addAt,
-        remove,
-        removeAll,
-        isDirty
+    return Object.assign(state, hasChildrenState, canBeDirtyState, {
+        update: pipe(hasChildrenState.update),
+        render: pipe(hasChildrenState.render, canBeDirtyState.render),
+        isDirty: pipe(hasChildrenState.hasDirtyChildren, canBeDirtyState.isDirty)
     });
 }

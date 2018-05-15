@@ -52,7 +52,7 @@ export default function renderer(canvas) {
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             scenes.forEach(scene => {
-                scene.draw(gl);
+                scene.render(gl);
             });
 
             _isDirty = false;

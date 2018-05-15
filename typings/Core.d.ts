@@ -9,15 +9,30 @@ namespace GD.Core {
         setSize(width: number, height: number): void;
     }
 
-    interface Scene {
-        children: [],
-        update(dt: number): void;
-        draw(gl: WebGLRenderingContext): void;
-        add(child: any): void;
-        addAt(child: any, index: number): void;
+    interface HasParent {
+        setParent(parent: object);
+        getParent(): object;
+        getGlobalPosition(): GD.Math.Vector2;
+    }
+
+    interface CanBeDirty {
+        isDirty(): boolean;
+        setDirty(dirtyState: boolean): void;
+        render(): void;
+    }
+
+    interface HasChildren {
+        add(child: object);
+        addAt(child: object, index: number);
         remove(child): void;
         removeAll(): void;
-        isDirty(): boolean;
+        hasDirtyChildren(): boolean;
+        render(): void;
+        update(): void;
+    }
+
+    interface Scene extends GD.Core.HasChildren, GD.Core.CanBeDirty {
+        name: string;
     }
 
     interface Renderer {
@@ -29,7 +44,7 @@ namespace GD.Core {
         removeScene(scene: GD.Core.Scene): void;
         isDirty(): boolean;
         getRenderingContext(): WebGLRenderingContext;
-        getAttribLocation(): GLint; 
+        getAttribLocation(): GLint;
         getUniformLocation(): GLint;
         onSceneAdded: signals.Signal;
         onSceneRemoved: signals.Signal;
