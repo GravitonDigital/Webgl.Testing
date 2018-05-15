@@ -8,6 +8,14 @@ export default function scene(name = '') {
         name: name
     };
 
+    function update(dt) {
+        for (let i = 0; i < state.children.length; i += 1) {
+            if (state.children[i].update) {
+                state.children[i].update(dt);
+            }
+        }
+    }
+
     function draw(gl) {
         for (let i = 0; i < state.children.length; i += 1) {
             state.children[i].draw(gl);
@@ -38,6 +46,7 @@ export default function scene(name = '') {
     }
 
     return Object.assign(state, {
+        update,
         draw,
         add,
         addAt,

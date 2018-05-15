@@ -11,6 +11,7 @@ namespace GD.Core {
 
     interface Scene {
         children: [],
+        update(dt: number): void;
         draw(gl: WebGLRenderingContext): void;
         add(child: any): void;
         addAt(child: any, index: number): void;
@@ -21,6 +22,7 @@ namespace GD.Core {
 
     interface Renderer {
         render(): void;
+        update(dt: number): void;
         getScenes(): Array<GD.Core.Scene>;
         addScene(scene: GD.Core.Scene): void;
         addSceneAt(scene: GD.Core.Scene, index: number): void;

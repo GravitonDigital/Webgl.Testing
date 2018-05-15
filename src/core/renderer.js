@@ -59,6 +59,14 @@ export default function renderer(canvas) {
         }
     }
 
+    function update(dt) {
+        scenes.forEach(scene => {
+            scene.update(dt);
+        });
+
+        render();
+    }
+
     function addScene(scene) {
         state.removeScene(scene);
         scenes.push(scene);
@@ -150,6 +158,7 @@ export default function renderer(canvas) {
 
     return Object.assign(state, {
         render,
+        update,
         getScenes,
         addScene,
         addSceneAt,

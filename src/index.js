@@ -10,12 +10,17 @@ import scenePicker from './userinterface/scenePicker';
 const stats = new Stats();
 stats.showPanel(0);
 document.body.appendChild(stats.dom);
+let last = undefined;
 
 function render(myRenderer) {
-    requestAnimationFrame(() => {
+    requestAnimationFrame(time => {
         stats.begin();
 
-        myRenderer.render();
+        if (!last) {
+            last = time;
+        }
+        myRenderer.update(time - last);
+        last = time;
 
         stats.end();
 
@@ -37,14 +42,14 @@ function main() {
     rect.setSize({ width: 100, height: 300 });
     rect.color = vector4(1, 0, 0);
     rect.colorUniform = myRenderer.getUniformLocation('u_color');
-    
+
     myScene.add(rect);
-    
+
     const myScenePicker = scenePicker();
     app.appendChild(myScenePicker.getDom());
     myScenePicker.attachTo(myRenderer);
     myScenePicker.addScene(myScene);
-    
+
     myRenderer.addScene(myScene);
 
     render(myRenderer);
