@@ -33,7 +33,7 @@ function main() {
     app.appendChild(canvas);
 
     const myRenderer = renderer(canvas);
-    myRenderer.skipClear = true;
+    // myRenderer.skipClear = true;
     const walkerScene = scene('Walker scene');
 
     const walker = randomWalker();

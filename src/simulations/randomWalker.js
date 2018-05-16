@@ -9,7 +9,7 @@ export default function randomWalker() {
 
     const timeBetweenSteps = 1;
     let timeSinceLastStep = 0;
-    const currentPos = vector2(600, 600);
+    const currentPos = vector2(0, 0);
     const stepSize = vector2(5, 5);
 
     function update(dt) {

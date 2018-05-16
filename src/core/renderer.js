@@ -3,6 +3,7 @@ import createShader from '../shaders/createShader';
 import vertexShaderFile from '../shaders/vertex/2d-vertex-shader.glsl';
 import fragmentShaderFile from '../shaders/fragment/2d-fragment-shader.glsl';
 import { Signal } from 'signals';
+import { mat4 } from 'gl-matrix';
 
 /**
  * @returns {GD.Core.Renderer}
@@ -12,7 +13,8 @@ export default function renderer(canvas) {
     const state = {
         onSceneAdded: new Signal(),
         onSceneRemoved: new Signal(),
-        skipClear: false
+        skipClear: false,
+        renderObjects: []
     };
 
     /**@type {Array<GD.Core.Scene} */
@@ -20,6 +22,11 @@ export default function renderer(canvas) {
     let program = undefined;
     let gl = undefined;
     let _isDirty = true;
+    const attribLocations = {};
+    const uniformLocations = {};
+    let positionBuffer = undefined;
+    let colorBuffer = undefined;
+    let indexBuffer = undefined;
 
     function createProgram(vertexShader, fragmentShader) {
         if (program) {
@@ -48,15 +55,58 @@ export default function renderer(canvas) {
 
     function render() {
         if (isDirty()) {
-            if (!state.skipClear) {
-                // Clear the canvas
-                gl.clearColor(0, 0, 0, 0);
-                gl.clear(gl.COLOR_BUFFER_BIT);
+            scenes.forEach(s => {
+                s.render(state);
+            });
+
+            let positions = [];
+            let colors = [];
+            let indices = [];
+
+            let needClear = false;
+
+            for(let roIndex = 0; roIndex < state.renderObjects.length; roIndex += 1){
+                const ro = state.renderObjects[roIndex];
+                if (ro.isNew || ro.isDirty) {
+                    positions = positions.concat(ro.positions);
+                    for (let i = 0; i < ro.positions.length; i += 1) {
+                        colors = colors.concat(ro.color);
+                    }
+                    indices = indices.concat(ro.indices.map(i => i + indices.length / 3 * 2));
+                }
+                if (ro.isDirty) {
+                    needClear = true;
+                }
+                ro.isNew = false;
+                ro.isDirty = false;
             }
 
-            scenes.forEach(scene => {
-                scene.render(state);
-            });
+            if (needClear) {
+                clear();
+            }
+
+            const normalize = false;
+            const stride = 0;
+            const offset = 0;
+
+            // positions
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+            gl.vertexAttribPointer(attribLocations.vertexPosition, 3, gl.FLOAT, normalize, stride, offset);
+            gl.enableVertexAttribArray(attribLocations.vertexPosition);
+
+            // colors
+            gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+            gl.vertexAttribPointer(attribLocations.vertexColor, 4, gl.FLOAT, normalize, stride, offset);
+            gl.enableVertexAttribArray(attribLocations.vertexColor);
+
+            //vertices
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+            //draw
+            gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, offset);
 
             _isDirty = false;
         }
@@ -89,8 +139,17 @@ export default function renderer(canvas) {
         if (index !== -1) {
             scenes.splice(index, 1);
             state.onSceneRemoved.dispatch(sceneToRemove);
+            clear();
             _isDirty = true;
         }
+    }
+
+    function clear() {
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clearDepth(1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
     function getScenes() {
@@ -113,8 +172,14 @@ export default function renderer(canvas) {
         return state.getUniformLocation('u_color');
     }
 
+    function initBuffers() {
+        positionBuffer = gl.createBuffer();
+        colorBuffer = gl.createBuffer();
+        indexBuffer = gl.createBuffer();
+    }
+
     function init() {
-        gl = canvas.getContext('webgl');
+        gl = canvas.getContext('webgl', { preserveDrawingBuffer: true });
         if (!gl) {
             throw 'You need webgl to run the content on this page';
         } else {
@@ -122,17 +187,10 @@ export default function renderer(canvas) {
             const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderFile);
             createProgram(vertexShader, fragmentShader);
 
-            // look up where the vertex data needs to go.
-            const positionAttributeLocation = getAttribLocation('a_position');
-
-            // look up uniform locations
-            const resolutionUniformLocation = getUniformLocation('u_resolution');
-
-            // Create a buffer to put three 2d clip space points in
-            const positionBuffer = gl.createBuffer();
-
-            // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            attribLocations.vertexPosition = gl.getAttribLocation(program, 'aVertexPosition');
+            attribLocations.vertexColor = gl.getAttribLocation(program, 'aVertexColor');
+            uniformLocations.projectionMatrix = gl.getUniformLocation(program, 'uProjectionMatrix');
+            uniformLocations.modelViewMatrix = gl.getUniformLocation(program, 'uModelViewMatrix');
 
             resizeCanvasToDisplaySize(gl.canvas);
 
@@ -142,22 +200,21 @@ export default function renderer(canvas) {
             // Tell it to use our program (pair of shaders)
             gl.useProgram(program);
 
-            // // Turn on the attribute
-            gl.enableVertexAttribArray(positionAttributeLocation);
+            initBuffers();
 
-            // // Bind the position buffer.
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            const fieldOfView = 45 * Math.PI / 180; // in radians
+            const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+            const zNear = 0.1;
+            const zFar = 1000;
+            const projectionMatrix = mat4.create();
 
-            // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-            const size = 2; // 2 components per iteration
-            const type = gl.FLOAT; // the data is 32bit floats
-            const normalize = false; // don't normalize the data
-            const stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-            let offset = 0; // start at the beginning of the buffer
-            gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
+            mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
-            // set the resolution
-            gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+            const modelViewMatrix = mat4.create();
+
+            mat4.translate(modelViewMatrix, modelViewMatrix, [-0.0, 0.0, -800]);
+            gl.uniformMatrix4fv(uniformLocations.projectionMatrix, false, projectionMatrix);
+            gl.uniformMatrix4fv(uniformLocations.modelViewMatrix, false, modelViewMatrix);
         }
     }
 
