@@ -12,7 +12,6 @@ export default function rectangle() {
     /**@type {GD.Shapes.Rectangle} */
     const state = {
         color: vector4(),
-        colorUniform: undefined
     };
 
     function getBufferArray() {
@@ -30,11 +29,14 @@ export default function rectangle() {
         gl.bufferData(gl.ARRAY_BUFFER, getBufferArray(), gl.STATIC_DRAW);
     }
 
-    function render(gl) {
-        console.log('draw');
+    function render(renderer) {
+        // if(!renderer.skipClear || state.isDirty()){
+        const gl = renderer.getRenderingContext();
         addToBuffer(gl);
-        gl.uniform4f(state.colorUniform, state.color.x, state.color.y, state.color.z, state.color.w);
+        gl.uniform4f(renderer.getColorUniform(), state.color.x, state.color.y, state.color.z, state.color.w);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
+        return renderer;
+        // }
     }
 
     function setSize(size) {

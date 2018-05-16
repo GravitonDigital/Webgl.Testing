@@ -7,7 +7,6 @@ export default function hasChildren(state) {
 
     function setParentOnChild(child, parent) {
         if (child.setParent) {
-            console.log(child, parent);
             child.setParent(parent);
         }
     }
@@ -41,6 +40,10 @@ export default function hasChildren(state) {
         childrenChanged = true;
     }
 
+    function getChildren(){
+        return children;
+    }
+
     function hasDirtyChildren(dirtyState) {
         return children.some(c => c.isDirty && c.isDirty()) || childrenChanged || !!dirtyState;
     }
@@ -53,11 +56,12 @@ export default function hasChildren(state) {
         }
     }
 
-    function render(gl) {
+    function render(renderer) {
         for (let i = 0; i < children.length; i += 1) {
-            children[i].render(gl);
+            children[i].render(renderer);
         }
         childrenChanged = false;
+        return renderer;
     }
 
     return {
@@ -65,6 +69,7 @@ export default function hasChildren(state) {
         addAt,
         remove,
         removeAll,
+        getChildren,
         hasDirtyChildren,
         render,
         update

@@ -12,8 +12,9 @@ export default function canBeDirty() {
         return _isDirty || !!dirtyState;
     }
 
-    function render(){
+    function render(renderer){
         setDirty(false);
+        return renderer;
     }
 
     return {

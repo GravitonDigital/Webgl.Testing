@@ -11,7 +11,8 @@ export default function renderer(canvas) {
     /**@type {GD.Core.Renderer} */
     const state = {
         onSceneAdded: new Signal(),
-        onSceneRemoved: new Signal()
+        onSceneRemoved: new Signal(),
+        skipClear: false
     };
 
     /**@type {Array<GD.Core.Scene} */
@@ -47,12 +48,14 @@ export default function renderer(canvas) {
 
     function render() {
         if (isDirty()) {
-            // Clear the canvas
-            gl.clearColor(0, 0, 0, 0);
-            gl.clear(gl.COLOR_BUFFER_BIT);
+            if (!state.skipClear) {
+                // Clear the canvas
+                gl.clearColor(0, 0, 0, 0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+            }
 
             scenes.forEach(scene => {
-                scene.render(gl);
+                scene.render(state);
             });
 
             _isDirty = false;
@@ -104,6 +107,10 @@ export default function renderer(canvas) {
 
     function getUniformLocation(uni) {
         return gl.getUniformLocation(program, uni);
+    }
+
+    function getColorUniform() {
+        return state.getUniformLocation('u_color');
     }
 
     function init() {
@@ -166,6 +173,7 @@ export default function renderer(canvas) {
         isDirty,
         getRenderingContext,
         getAttribLocation,
-        getUniformLocation
+        getUniformLocation,
+        getColorUniform
     });
 }
