@@ -210,6 +210,8 @@ export default function renderer(canvas) {
             mat4.translate(modelViewMatrix, modelViewMatrix, [-0.0, 0.0, -1500]);
             gl.uniformMatrix4fv(uniformLocations.projectionMatrix, false, projectionMatrix);
             gl.uniformMatrix4fv(uniformLocations.modelViewMatrix, false, modelViewMatrix);
+
+            clear();
         }
     }
 

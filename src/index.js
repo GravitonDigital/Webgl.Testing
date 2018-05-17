@@ -44,8 +44,6 @@ function main() {
     myScenePicker.attachTo(myRenderer);
     myScenePicker.addScene(walkerScene);
 
-    myRenderer.addScene(walkerScene);
-
     render(myRenderer);
 }
 main();
