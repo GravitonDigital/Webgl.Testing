@@ -13,7 +13,6 @@ export default function renderer(canvas) {
     const state = {
         onSceneAdded: new Signal(),
         onSceneRemoved: new Signal(),
-        skipClear: false,
         renderObjects: []
     };
 
@@ -168,10 +167,6 @@ export default function renderer(canvas) {
         return gl.getUniformLocation(program, uni);
     }
 
-    function getColorUniform() {
-        return state.getUniformLocation('u_color');
-    }
-
     function initBuffers() {
         positionBuffer = gl.createBuffer();
         colorBuffer = gl.createBuffer();
@@ -205,14 +200,14 @@ export default function renderer(canvas) {
             const fieldOfView = 45 * Math.PI / 180; // in radians
             const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
             const zNear = 0.1;
-            const zFar = 1000;
+            const zFar = 1600;
             const projectionMatrix = mat4.create();
 
             mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
             const modelViewMatrix = mat4.create();
 
-            mat4.translate(modelViewMatrix, modelViewMatrix, [-0.0, 0.0, -800]);
+            mat4.translate(modelViewMatrix, modelViewMatrix, [-0.0, 0.0, -1500]);
             gl.uniformMatrix4fv(uniformLocations.projectionMatrix, false, projectionMatrix);
             gl.uniformMatrix4fv(uniformLocations.modelViewMatrix, false, modelViewMatrix);
         }
@@ -231,6 +226,5 @@ export default function renderer(canvas) {
         getRenderingContext,
         getAttribLocation,
         getUniformLocation,
-        getColorUniform
     });
 }

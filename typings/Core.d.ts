@@ -18,7 +18,7 @@ namespace GD.Core {
     interface CanBeDirty {
         isDirty(): boolean;
         setDirty(dirtyState: boolean): void;
-        render(): void;
+        render(renderer: GD.Core.Renderer): GD.Core.Renderer;
     }
 
     interface HasChildren {
@@ -27,7 +27,7 @@ namespace GD.Core {
         remove(child): void;
         removeAll(): void;
         hasDirtyChildren(): boolean;
-        render(): void;
+        render(renderer: GD.Core.Renderer): GD.Core.Renderer;
         update(): void;
     }
 
@@ -50,5 +50,6 @@ namespace GD.Core {
         getUniformLocation(): GLint;
         onSceneAdded: signals.Signal;
         onSceneRemoved: signals.Signal;
+        renderObjects: Array<object>;
     }
 }
