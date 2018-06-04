@@ -34,9 +34,22 @@ export default function hasParent(state) {
         return position;
     }
 
+    function getParentOfType(type) {
+        if (!parent) {
+            return null;
+        }
+        if (parent.type === type) {
+            return parent;
+        } else if (parent.getParentOfType) {
+            return parent.getParentOfType(type);
+        }
+        return null;
+    }
+
     return {
         setParent,
         getParent,
-        getGlobalPosition
+        getGlobalPosition,
+        getParentOfType
     };
 }

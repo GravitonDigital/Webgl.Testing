@@ -4,6 +4,7 @@ import vertexShaderFile from '../shaders/vertex/2d-vertex-shader.glsl';
 import fragmentShaderFile from '../shaders/fragment/2d-fragment-shader.glsl';
 import { Signal } from 'signals';
 import { mat4 } from 'gl-matrix';
+import { TYPE } from '../Const';
 
 /**
  * @returns {GD.Core.Renderer}
@@ -13,7 +14,8 @@ export default function renderer(canvas) {
     const state = {
         onSceneAdded: new Signal(),
         onSceneRemoved: new Signal(),
-        renderObjects: []
+        renderObjects: [],
+        type: TYPE.RENDERER
     };
 
     /**@type {Array<GD.Core.Scene} */
@@ -49,11 +51,15 @@ export default function renderer(canvas) {
     }
 
     function isDirty() {
-        return scenes.some(scene => scene.isDirty()) || _isDirty;
+        return _isDirty;
+    }
+
+    function hasDirtyScene() {
+        return scenes.some(scene => scene.isDirty());
     }
 
     function render() {
-        if (isDirty()) {
+        if (hasDirtyScene() || isDirty()) {
             scenes.forEach(s => {
                 s.render(state);
             });
@@ -64,7 +70,7 @@ export default function renderer(canvas) {
 
             let needClear = false;
 
-            for(let roIndex = 0; roIndex < state.renderObjects.length; roIndex += 1){
+            for (let roIndex = 0; roIndex < state.renderObjects.length; roIndex += 1) {
                 const ro = state.renderObjects[roIndex];
                 if (ro.isNew || ro.isDirty) {
                     positions = positions.concat(ro.positions);
@@ -224,9 +230,10 @@ export default function renderer(canvas) {
         addScene,
         addSceneAt,
         removeScene,
-        isDirty,
+        hasDirtyScene,
         getRenderingContext,
         getAttribLocation,
         getUniformLocation,
+        isDirty
     });
 }

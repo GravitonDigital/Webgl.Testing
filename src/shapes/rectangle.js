@@ -4,6 +4,7 @@ import size from '../core/size';
 import pipe from '../utils/pipe';
 import hasParent from '../core/hasParent';
 import canBeDirty from '../core/canBeDirty';
+import { TYPE } from '../Const';
 
 let rectIndex = 0;
 
@@ -15,7 +16,8 @@ export default function rectangle() {
     /**@type {GD.Shapes.Rectangle} */
     const state = {
         color: vector4(),
-        id: `rect_${rectIndex}`
+        id: `rect_${rectIndex}`,
+        type: TYPE.RECTANGLE
     };
     rectIndex += 1;
 
@@ -33,7 +35,7 @@ export default function rectangle() {
     }
 
     function render(renderer) {
-        if (state.isDirty()) {
+        if (state.isDirty() || renderer.isDirty()) {
             let renderObj = renderer.renderObjects.find(r => r.id === state.id);
             if (!renderObj) {
                 renderObj = {

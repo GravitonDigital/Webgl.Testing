@@ -3,9 +3,12 @@ import pipe from '../utils/pipe';
 import rectangle from '../shapes/rectangle';
 import vector2 from '../math/vector2';
 import vector4 from '../math/vector4';
+import { TYPE } from '../Const';
 
 export default function randomWalker() {
-    const state = {};
+    const state = {
+        type: TYPE.RANDOM_WALKER
+    };
 
     const timeBetweenSteps = 1;
     let timeSinceLastStep = 0;

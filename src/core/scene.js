@@ -2,6 +2,7 @@ import hasChildren from './hasChildren';
 import pipe from '../utils/pipe';
 import canBeDirty from './canBeDirty';
 import hasParent from './hasParent';
+import { TYPE } from '../Const';
 
 /**
  * @returns {GD.Core.Scene}
@@ -9,7 +10,8 @@ import hasParent from './hasParent';
 export default function scene(name) {
     /**@type {GD.Core.Scene} */
     const state = {
-        name: name || ''
+        name: name || '',
+        type: TYPE.SCENE
     };
 
     const hasChildrenState = hasChildren(state);

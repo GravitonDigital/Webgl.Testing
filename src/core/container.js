@@ -2,14 +2,17 @@ import hasChildren from './hasChildren';
 import pipe from '../utils/pipe';
 import canBeDirty from './canBeDirty';
 import position from './position';
+import { TYPE } from '../Const';
 
 /**
  * @returns {GD.Core.Container}
  */
 export default function container() {
     /**@type {GD.Core.Container} */
-    const state = {};
-    
+    const state = {
+        type: TYPE.CONTAINER
+    };
+
     function setPosition(position) {
         state.setDirty(true);
         return position;
@@ -23,6 +26,6 @@ export default function container() {
         update: pipe(hasChildrenState.update),
         render: pipe(hasChildrenState.render, canBeDirtyState.render),
         isDirty: pipe(hasChildrenState.hasDirtyChildren, canBeDirtyState.isDirty),
-        setPosition: pipe(setPosition, positionState.setPosition),
+        setPosition: pipe(setPosition, positionState.setPosition)
     });
 }
