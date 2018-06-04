@@ -50,6 +50,15 @@ namespace GD.Core {
         getUniformLocation(): GLint;
         onSceneAdded: signals.Signal;
         onSceneRemoved: signals.Signal;
-        renderObjects: Array<object>;
+        renderObjects: Array<GD.Core.RenderObject>;
+    }
+
+    interface RenderObject {
+        id: string;
+        color: Array<number>;
+        positions: Array<number>;
+        indices: Array<number>;
+        isNew: boolean;
+        isDirty: boolean;
     }
 }

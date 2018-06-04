@@ -114,6 +114,7 @@ export default function renderer(canvas) {
             gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, offset);
 
             _isDirty = false;
+            state.renderObjects = [];
         }
     }
 

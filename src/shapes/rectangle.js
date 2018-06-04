@@ -17,7 +17,8 @@ export default function rectangle() {
     const state = {
         color: vector4(),
         id: `rect_${rectIndex}`,
-        type: TYPE.RECTANGLE
+        type: TYPE.RECTANGLE,
+        renderObject: undefined
     };
     rectIndex += 1;
 
@@ -36,9 +37,8 @@ export default function rectangle() {
 
     function render(renderer) {
         if (state.isDirty() || renderer.isDirty()) {
-            let renderObj = renderer.renderObjects.find(r => r.id === state.id);
-            if (!renderObj) {
-                renderObj = {
+            if (!state.renderObject) {
+                state.renderObject = {
                     id: state.id,
                     color: [],
                     positions: [],
@@ -46,16 +46,16 @@ export default function rectangle() {
                     isNew: true,
                     isDirty: false
                 };
-                renderer.renderObjects.push(renderObj);
             } else {
-                renderObj.isDirty = true;
+                state.renderObject.isDirty = true;
             }
 
-            renderObj.color = [state.color.x, state.color.y, state.color.z, state.color.w];
-            renderObj.positions = getBufferArray();
-            renderObj.indices = [0, 1, 2, 0, 2, 3];
+            state.renderObject.color = [state.color.x, state.color.y, state.color.z, state.color.w];
+            state.renderObject.positions = getBufferArray();
+            state.renderObject.indices = [0, 1, 2, 0, 2, 3];
         }
-
+        
+        renderer.renderObjects.push(state.renderObject);
         return renderer;
     }
 
