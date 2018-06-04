@@ -73,11 +73,15 @@ export default function renderer(canvas) {
             for (let roIndex = 0; roIndex < state.renderObjects.length; roIndex += 1) {
                 const ro = state.renderObjects[roIndex];
                 if (ro.isNew || ro.isDirty) {
-                    positions = positions.concat(ro.positions);
+                    Array.prototype.push.apply(positions, ro.positions);
                     for (let i = 0; i < ro.positions.length; i += 1) {
-                        colors = colors.concat(ro.color);
+                        Array.prototype.push.apply(colors, ro.color);
                     }
-                    indices = indices.concat(ro.indices.map(i => i + indices.length / 3 * 2));
+                    const newIndices = [];
+                    for (let i = 0; i < ro.indices.length; i += 1) {
+                        newIndices.push(ro.indices[i] + indices.length / 3 * 2);
+                    }
+                    Array.prototype.push.apply(indices, newIndices);
                 }
                 if (ro.isDirty) {
                     needClear = true;
