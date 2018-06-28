@@ -27,15 +27,15 @@ export default function scenePicker() {
     function updateDom() {
         clearDom();
         if (renderer) {
-            const currentScenes = renderer.getScenes();
-            currentScenes.forEach(scene => {
-                addSceneToDom(scene);
-            });
+            // const currentScenes = renderer.getScenes();
+            // currentScenes.forEach(scene => {
+            //     addSceneToDom(scene);
+            // });
 
             scenes.forEach(scene => {
-                if (currentScenes.indexOf(scene) === -1) {
-                    addSceneToDom(scene);
-                }
+                // if (currentScenes.indexOf(scene) === -1) {
+                addSceneToDom(scene);
+                // }
             });
         }
     }

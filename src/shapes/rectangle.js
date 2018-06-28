@@ -15,7 +15,7 @@ let rectIndex = 0;
 export default function rectangle() {
     /**@type {GD.Shapes.Rectangle} */
     const state = {
-        color: vector4(),
+        color: vector4(1, 1, 1, 1),
         id: `rect_${rectIndex}`,
         type: TYPE.RECTANGLE,
         renderObject: undefined
@@ -54,7 +54,7 @@ export default function rectangle() {
             state.renderObject.positions = getBufferArray();
             state.renderObject.indices = [0, 1, 2, 0, 2, 3];
         }
-        
+
         renderer.renderObjects.push(state.renderObject);
         return renderer;
     }
@@ -74,9 +74,13 @@ export default function rectangle() {
     const hasParentState = hasParent(state);
     const canBeDirtyState = canBeDirty();
 
-    return Object.assign(state, positionState, sizeState, hasParentState, canBeDirtyState, {
+    Object.assign(state, positionState, sizeState, hasParentState, canBeDirtyState, {
         render: pipe(render, canBeDirtyState.render),
         setSize: pipe(setSize, sizeState.setSize),
         setPosition: pipe(setPosition, positionState.setPosition)
     });
+
+    state.setSize({width: 1, height: 1});
+
+    return state;
 }
